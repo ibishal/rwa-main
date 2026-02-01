@@ -1,0 +1,5 @@
+{
+  "name": "Duskpool",
+  "description": "A private trading venue for tokenized real-world assets on Stellar using zero-knowledge proofs.",
+  "requestFramePermissions": []
+}
