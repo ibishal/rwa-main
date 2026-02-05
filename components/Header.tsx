@@ -1,19 +1,38 @@
 import React from 'react';
-import { ArrowRight, Wallet, Menu } from 'lucide-react';
+import { ArrowRight, Wallet, Menu, LogOut, LayoutDashboard, History as HistoryIcon, Landmark } from 'lucide-react';
 
 interface HeaderProps {
   onNavigate?: (page: string) => void;
   currentPage?: string;
+  isConnected?: boolean;
+  onConnect?: () => void;
+  onDisconnect?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'home' }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  onNavigate, 
+  currentPage = 'home', 
+  isConnected = false,
+  onConnect,
+  onDisconnect
+}) => {
   
-  const navItems = [
+  const publicNavItems = [
     { label: 'MARKETS', id: 'markets' },
-    { label: 'TRADE', id: 'trade' },
+    { label: 'TERMINAL', id: 'trade' },
     { label: 'PROTOCOL', id: 'protocol' },
     { label: 'FAQ', id: 'faq' }
   ];
+
+  const privateNavItems = [
+    { label: 'DASHBOARD', id: 'dashboard' },
+    { label: 'TRADE', id: 'trade' },
+    { label: 'ASSETS', id: 'markets' },
+    { label: 'ESCROW', id: 'escrow' },
+    { label: 'HISTORY', id: 'history' },
+  ];
+
+  const navItems = isConnected ? privateNavItems : publicNavItems;
 
   const handleNavClick = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -28,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'home' }) => 
       <div className="flex items-center">
         <div 
           className="relative group cursor-pointer" 
-          onClick={(e) => handleNavClick('home', e)}
+          onClick={(e) => handleNavClick(isConnected ? 'dashboard' : 'home', e)}
         >
           <h1 className="text-2xl md:text-3xl font-condensed tracking-wide italic font-bold text-white uppercase">
             Duskpool
@@ -81,26 +100,37 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'home' }) => 
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
-          {/* Connect Wallet Button */}
-          <button className="group flex items-center gap-3 bg-zinc-900/80 backdrop-blur-md border border-white/10 hover:border-brand-stellar/50 rounded-full pl-6 pr-2 py-2 transition-all duration-300">
-            <span className="text-[11px] font-bold tracking-widest text-white">CONNECT WALLET</span>
-            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-brand-stellar/20 transition-colors">
-              <ArrowRight className="w-3 h-3 text-white -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+          {/* Connect/Disconnect Wallet Button */}
+          {!isConnected ? (
+            <button 
+              onClick={onConnect}
+              className="group flex items-center gap-3 bg-zinc-900/80 backdrop-blur-md border border-white/10 hover:border-brand-stellar/50 rounded-full pl-6 pr-2 py-2 transition-all duration-300"
+            >
+              <span className="text-[11px] font-bold tracking-widest text-white">CONNECT WALLET</span>
+              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-brand-stellar/20 transition-colors">
+                <ArrowRight className="w-3 h-3 text-white -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+              </div>
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+               {/* Network Indicator */}
+               <div className="px-3 py-1.5 bg-zinc-900/80 rounded-full border border-white/5 flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-[10px] text-gray-400 font-mono">TESTNET</span>
+               </div>
+               
+               {/* User Address / Disconnect */}
+               <button 
+                onClick={onDisconnect}
+                className="group flex items-center gap-3 bg-zinc-900/80 backdrop-blur-md border border-brand-stellar/30 hover:border-red-500/50 rounded-full pl-4 pr-2 py-2 transition-all duration-300"
+              >
+                <span className="text-[11px] font-mono text-white group-hover:text-red-400 transition-colors">0x71...3A92</span>
+                <div className="w-8 h-8 rounded-full bg-brand-stellar/20 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                  <LogOut className="w-3 h-3 text-white transition-transform duration-300" />
+                </div>
+              </button>
             </div>
-          </button>
-
-          {/* Wallet Icon */}
-          <button className="w-12 h-12 flex items-center justify-center bg-zinc-900/80 backdrop-blur-md border border-white/10 hover:border-white/30 rounded-full transition-all duration-300 group">
-            <Wallet className="w-4 h-4 text-gray-300 group-hover:text-white transition-colors" />
-          </button>
-
-          {/* Menu Icon */}
-          <button className="w-12 h-12 flex items-center justify-center bg-zinc-900/80 backdrop-blur-md border border-white/10 hover:border-white/30 rounded-full transition-all duration-300 group">
-            <div className="flex flex-col gap-[5px] items-end">
-              <span className="w-5 h-[1.5px] bg-gray-300 group-hover:bg-white transition-colors"></span>
-              <span className="w-3 h-[1.5px] bg-gray-300 group-hover:bg-white transition-colors group-hover:w-5 duration-300"></span>
-            </div>
-          </button>
+          )}
         </div>
       </div>
 

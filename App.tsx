@@ -5,11 +5,15 @@ import Markets from './components/Markets';
 import Protocol from './components/Protocol';
 import Trade from './components/Trade';
 import FAQ from './components/FAQ';
+import Dashboard from './components/Dashboard';
+import Escrow from './components/Escrow';
+import History from './components/History';
 import BackgroundEffects from './components/BackgroundEffects';
 import Sidebar from './components/Sidebar';
 
 const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   const [currentPage, setCurrentPage] = useState('home');
 
   useEffect(() => {
@@ -18,14 +22,35 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleConnect = () => {
+    setIsConnected(true);
+    setCurrentPage('dashboard');
+  };
+
+  const handleDisconnect = () => {
+    setIsConnected(false);
+    setCurrentPage('home');
+  };
+
   const renderPage = () => {
-    switch (currentPage) {
-      case 'markets': return <Markets />;
-      case 'trade': return <Trade />;
-      case 'protocol': return <Protocol />;
-      case 'faq': return <FAQ />;
-      case 'home':
-      default: return <Hero />;
+    if (isConnected) {
+      switch (currentPage) {
+        case 'dashboard': return <Dashboard onNavigate={setCurrentPage} />;
+        case 'trade': return <Trade />;
+        case 'escrow': return <Escrow />;
+        case 'history': return <History />;
+        case 'markets': return <Markets />; // Assets view
+        default: return <Dashboard onNavigate={setCurrentPage} />;
+      }
+    } else {
+      switch (currentPage) {
+        case 'markets': return <Markets />;
+        case 'trade': return <Trade />; // Public view of terminal (read-only theoretically)
+        case 'protocol': return <Protocol />;
+        case 'faq': return <FAQ />;
+        case 'home':
+        default: return <Hero />;
+      }
     }
   };
 
@@ -34,8 +59,14 @@ const App: React.FC = () => {
       <BackgroundEffects />
       
       <div className={`transition-opacity duration-1000 ease-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-        <Header onNavigate={setCurrentPage} currentPage={currentPage} />
-        <Sidebar />
+        <Header 
+          onNavigate={setCurrentPage} 
+          currentPage={currentPage} 
+          isConnected={isConnected}
+          onConnect={handleConnect}
+          onDisconnect={handleDisconnect}
+        />
+        {!isConnected && <Sidebar />}
         
         <main className="relative z-10 w-full min-h-screen flex flex-col pt-20">
           {renderPage()}
