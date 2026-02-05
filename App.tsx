@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import Markets from './components/Markets';
+import Protocol from './components/Protocol';
+import Trade from './components/Trade';
+import FAQ from './components/FAQ';
 import BackgroundEffects from './components/BackgroundEffects';
 import Sidebar from './components/Sidebar';
-import { MouseFollower } from './components/MouseFollower';
 
 const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentPage, setCurrentPage] = useState('home');
 
   useEffect(() => {
     // Simulate asset loading for smooth entrance
@@ -14,16 +18,27 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'markets': return <Markets />;
+      case 'trade': return <Trade />;
+      case 'protocol': return <Protocol />;
+      case 'faq': return <FAQ />;
+      case 'home':
+      default: return <Hero />;
+    }
+  };
+
   return (
-    <div className="relative w-full min-h-screen bg-black text-white overflow-hidden selection:bg-white/20 selection:text-white">
+    <div className="relative w-full min-h-screen bg-black text-white overflow-hidden selection:bg-brand-stellar/30 selection:text-white">
       <BackgroundEffects />
       
       <div className={`transition-opacity duration-1000 ease-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-        <Header />
+        <Header onNavigate={setCurrentPage} currentPage={currentPage} />
         <Sidebar />
         
-        <main className="relative z-10 w-full h-screen flex flex-col items-center justify-center pt-20">
-          <Hero />
+        <main className="relative z-10 w-full min-h-screen flex flex-col pt-20">
+          {renderPage()}
         </main>
       </div>
 

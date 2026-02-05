@@ -1,16 +1,39 @@
 import React from 'react';
 import { ArrowRight, Wallet, Menu } from 'lucide-react';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onNavigate?: (page: string) => void;
+  currentPage?: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'home' }) => {
+  
+  const navItems = [
+    { label: 'MARKETS', id: 'markets' },
+    { label: 'TRADE', id: 'trade' },
+    { label: 'PROTOCOL', id: 'protocol' },
+    { label: 'FAQ', id: 'faq' }
+  ];
+
+  const handleNavClick = (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onNavigate) {
+      onNavigate(id);
+    }
+  };
+
   return (
-    <header className="fixed top-0 left-0 w-full z-50 px-6 py-6 md:px-12 md:py-8 flex items-start justify-between">
+    <header className="fixed top-0 left-0 w-full z-50 px-6 py-6 md:px-12 md:py-8 flex items-start justify-between bg-gradient-to-b from-black/80 to-transparent backdrop-blur-[2px]">
       {/* Logo Area */}
       <div className="flex items-center">
-        <div className="relative group cursor-pointer">
+        <div 
+          className="relative group cursor-pointer" 
+          onClick={(e) => handleNavClick('home', e)}
+        >
           <h1 className="text-2xl md:text-3xl font-condensed tracking-wide italic font-bold text-white uppercase">
             Duskpool
           </h1>
-          {/* Logo decorative element - abstract pool/wave */}
+          {/* Logo decorative element */}
           <svg className="absolute -top-3 -left-2 w-32 h-12 pointer-events-none opacity-90" viewBox="0 0 100 40">
             <path 
               d="M10,25 Q40,15 90,25" 
@@ -30,22 +53,29 @@ const Header: React.FC = () => {
         {/* Main Nav Links */}
         <nav className="flex items-center bg-zinc-900/80 backdrop-blur-md border border-white/10 rounded-full px-1 py-1 mr-4">
           <ul className="flex items-center space-x-1">
-            {['MARKETS', 'TRADE', 'POOLS', 'GOVERNANCE'].map((item, index) => (
-              <li key={item}>
-                <a 
-                  href={`#${item.toLowerCase()}`}
-                  className={`
-                    relative px-6 py-2.5 text-[11px] font-medium tracking-widest text-gray-300 transition-all duration-300 rounded-full hover:text-white
-                    ${index === 0 ? 'bg-white/10 text-white shadow-[0_0_15px_rgba(125,0,255,0.2)]' : 'hover:bg-white/5'}
-                  `}
-                >
-                  <span className={`${index === 0 ? 'flex items-center gap-2' : ''}`}>
-                    {index === 0 && <span className="w-1 h-1 bg-brand-stellar rounded-full animate-pulse shadow-[0_0_5px_#7d00ff]"></span>}
-                    {item}
-                  </span>
-                </a>
-              </li>
-            ))}
+            {navItems.map((item) => {
+              const isActive = currentPage === item.id;
+              return (
+                <li key={item.id}>
+                  <a 
+                    href={`#${item.id}`}
+                    onClick={(e) => handleNavClick(item.id, e)}
+                    className={`
+                      relative px-6 py-2.5 text-[11px] font-medium tracking-widest transition-all duration-300 rounded-full
+                      ${isActive 
+                        ? 'bg-white/10 text-white shadow-[0_0_15px_rgba(125,0,255,0.2)]' 
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }
+                    `}
+                  >
+                    <span className={`${isActive ? 'flex items-center gap-2' : ''}`}>
+                      {isActive && <span className="w-1 h-1 bg-brand-stellar rounded-full animate-pulse shadow-[0_0_5px_#7d00ff]"></span>}
+                      {item.label}
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -74,7 +104,7 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Toggle (Visible only on small screens) */}
+      {/* Mobile Menu Toggle */}
       <button className="lg:hidden w-10 h-10 flex items-center justify-center bg-zinc-900 border border-white/10 rounded-full">
         <Menu className="w-5 h-5 text-white" />
       </button>
